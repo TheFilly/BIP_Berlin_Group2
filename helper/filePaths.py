@@ -6,5 +6,6 @@ metadata_liste3 = Path("/Users/filly/Documents/Uni - HTW/IuG/Data/Objektdaten/li
 source_pics = Path("/Users/filly/Documents/Uni - HTW/IuG/Data/Objektbilder")
 target_dir_list2 = Path("/Users/filly/Documents/Uni - HTW/IuG/Code/Pictures/List2")
 target_dir_list3 = Path("/Users/filly/Documents/Uni - HTW/IuG/Code/Pictures/List3")
-log_missing_pictures = Path("/Users/filly/Documents/Uni - HTW/IuG/Code/Pictures/missingPictures.txt")
+log_missing_pictures = Path("/Users/filly/Documents/Uni - HTW/IuG/Code/meta/missingPictures.txt")
+store_path = Path("/Users/filly/Documents/Uni - HTW/IuG/Code/meta/pictures_db.json")
 

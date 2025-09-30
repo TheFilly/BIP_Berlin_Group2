@@ -95,7 +95,7 @@ def copy_pictures(pic_names, source_dir_year: Path, target_dir: Path):
     # Nur neue, noch nicht geloggte Namen anhängen
     to_write = [n for n in sorted(missing_names_this_run) if n not in existing]
     if to_write:
-        with open(log_missing_pictures, "a", encoding="utf-8") as f:
+        with open(filePaths.log_missing_pictures, "a", encoding="utf-8") as f:
             for n in to_write:
                 f.write(n + "\n")
 
@@ -116,3 +116,4 @@ def extractID(pic_names: Iterable[str]) -> Set[str]:
             obername = "-".join(parts[:-1])  # alles außer die letzten drei Ziffern
             extractedID.add(obername)
     return extractedID
+
