@@ -6,7 +6,8 @@ import shutil
 from typing import List, Iterable, Set
 
 
-from helper.filePaths import *
+import helper.filePaths as filePaths
+
 
 
 def readColumns(path: Path, start_row: int, end_row: int, sheet_name=0):
@@ -66,12 +67,12 @@ def extract_jpg_filenames(cd_value) -> List[str]:
 
 def copy_pictures(pic_names, source_dir_year: Path, target_dir: Path):
     target_dir.mkdir(parents=True, exist_ok=True)
-    log_missing_pictures.parent.mkdir(parents=True, exist_ok=True)
+    filePaths.log_missing_pictures.parent.mkdir(parents=True, exist_ok=True)
 
     # Bereits geloggte Namen laden (falls Datei existiert)
     existing = set()
-    if log_missing_pictures.exists():
-        with open(log_missing_pictures, "r", encoding="utf-8") as f:
+    if filePaths.log_missing_pictures.exists():
+        with open(filePaths.log_missing_pictures, "r", encoding="utf-8") as f:
             existing = {line.strip() for line in f if line.strip()}
 
     copied = 0
@@ -102,7 +103,7 @@ def copy_pictures(pic_names, source_dir_year: Path, target_dir: Path):
         f"Fertig: {copied} kopiert, "
         f"{len(missing_names_this_run)} nicht gefunden "
         f"({len(to_write)} neu ins Log geschrieben). "
-        f"Log: {log_missing_pictures if to_write else '—'}"
+        f"Log: {filePaths.log_missing_pictures if to_write else '—'}"
     )
     return copied, len(missing_names_this_run), len(to_write)
 
