@@ -6,6 +6,9 @@ import shutil
 from typing import List, Iterable, Set
 
 
+from helper.filePaths import *
+
+
 def readColumns(path: Path, start_row: int, end_row: int, sheet_name=0):
    
     engine = "xlrd" if path.suffix.lower() == ".xls" else None
