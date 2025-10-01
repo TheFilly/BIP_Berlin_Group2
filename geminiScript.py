@@ -8,11 +8,18 @@ from typing import Dict, List
 
 from google import genai
 
-# TODO: Implement Top Categorization and Subcategorization; Edit Prompt accordingly
+# INFO: Running Instructions
+# python3 geminiScript.py --image-dir Pictures/List2
+TOP_CATEGORIES = ["video devices", "audio devices", "telephones", "other"]
+
 PROMPT = (
-    "You are a museum cataloging assistant. "
-    "Review the provided image group of one item and answer with a single concise category, "
-    "such as 'rotary phone', 'hairdryer', etc. Avoid extra text."
+    "You are a museum cataloging assistant.\n"
+    "Review the provided image group belonging to a single catalog item.\n"
+    f"Assign exactly one top category from this list: {', '.join(TOP_CATEGORIES)}.\n"
+    "Create a concise subcategory that further describes the object, such as 'rotary phone', 'hairdryer', etc. Avoid extra text.\n"
+    "Respond with valid JSON using this schema: {\"top_category\": string, \"subcategory\": string}.\n"
+    "Top category must match one of the allowed values exactly.\n"
+    "Do not include explanations, Markdown, or additional text."
 )
 
 # Establish a Gemini client using the API key pulled from the environment.
@@ -43,10 +50,10 @@ def group_images(image_dir: Path) -> Dict[str, List[Path]]:
         groups[item_id].append(path)
     return groups
 
-# Send one grouped set of images to Gemini and return the predicted category label.
+# Send one grouped set of images to Gemini and return the predicted category labels.
 def categorize_group(
     client: genai.Client, model_name: str, paths: List[Path]
-) -> str:
+) -> Dict[str, str]:
     parts = [{"text": PROMPT}, *[load_image_part(p) for p in sorted(paths)]]
     response = client.models.generate_content(
         model=model_name,
@@ -55,7 +62,27 @@ def categorize_group(
     output_text = getattr(response, "text", "")
     if not output_text:
         raise ValueError("Model returned no text output.")
-    return output_text.strip()
+    try:
+        payload = json.loads(output_text)
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"Model response is not valid JSON: {output_text}") from exc
+
+    top_category = payload.get("top_category")
+    subcategory = payload.get("subcategory")
+
+    if not isinstance(top_category, str) or not top_category.strip():
+        raise ValueError("Model response missing 'top_category'.")
+    top_category = top_category.strip().lower()
+    if top_category not in TOP_CATEGORIES:
+        raise ValueError(
+            f"Top category '{top_category}' is not in the allowed list: {TOP_CATEGORIES}."
+        )
+
+    if not isinstance(subcategory, str) or not subcategory.strip():
+        raise ValueError("Model response missing 'subcategory'.")
+    subcategory = subcategory.strip()
+
+    return {"top_category": top_category, "subcategory": subcategory}
 
 # Iterate over all image groups, categorize them, and persist the results as JSON.
 def run(image_dir: Path, output_path: Path, model_name: str) -> None:
@@ -63,18 +90,17 @@ def run(image_dir: Path, output_path: Path, model_name: str) -> None:
     grouped = group_images(image_dir)
     results = []
     for item_id, paths in grouped.items():
+        record = {
+            "item_id": item_id,
+            "file_count": len(paths),
+            "files": [p.name for p in paths],
+        }
         try:
-            category = categorize_group(client, model_name, paths)
+            classification = categorize_group(client, model_name, paths)
+            record.update(classification)
         except Exception as exc:
-            category = f"ERROR: {exc}"
-        results.append(
-            {
-                "item_id": item_id,
-                "file_count": len(paths),
-                "files": [p.name for p in paths],
-                "category": category,
-            }
-        )
+            record.update({"top_category": None, "subcategory": None, "error": str(exc)})
+        results.append(record)
     output_path.write_text(json.dumps(results, indent=2), encoding="utf-8")
 
 # Parse CLI arguments controlling input directory, output path, and model selection.
