@@ -117,7 +117,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("catalog_results.json"),
+        default=Path("meta/catalog_results.json"),
         help="Path to write the JSON output.",
     )
     parser.add_argument(

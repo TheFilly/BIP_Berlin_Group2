@@ -1,0 +1,30 @@
+[
+  {
+    "item_id": "1477",
+    "file_count": 1,
+    "files": [
+      "1-1996-1477-000-001.jpg"
+    ],
+    "category": "Teapot"
+  },
+  {
+    "item_id": "1063",
+    "file_count": 3,
+    "files": [
+      "1-1997-1063-000-004.JPG",
+      "1-1997-1063-000-003.JPG",
+      "1-1997-1063-000-002.JPG"
+    ],
+    "category": "Hairdryer"
+  },
+  {
+    "item_id": "1476",
+    "file_count": 3,
+    "files": [
+      "1-1996-1476-000-006.JPG",
+      "1-1996-1476-000-012.JPG",
+      "1-1996-1476-000-005.JPG"
+    ],
+    "category": "Electric iron"
+  }
+]

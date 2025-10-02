@@ -24,32 +24,33 @@ PROMPT_CATEGORIZE = (
 
 PROMPT_TELEPHONE = (
 "You are an academic catalog writer for a museum of technology. \n"
-"Your task is to create concise, formal catalog entries for historical objects. \n"
-"Always write in a neutral, factual tone, like a printed catalog. \n"
+"Your task is to create concise, formal catalog entries for historical telephones. \n"
+"Always write in a neutral, factual tone, similar to a printed museum catalog. \n"
 "Do not invent facts: only use the provided information or what is clearly visible in the image. \n"
 "Format: 3–5 sentences in one paragraph, no bullets. \n"
-"Include: object type, manufacturer, model name, year, and notable context. \n"
-"If any information is unknown, mark it as unknown.\n"
+"Include: telephone type (e.g. rotary dial, candlestick, push-button), manufacturer, model name, year of production, materials, colors, and notable design or functional context. \n"
+"If any information is unknown, mark it as unknown."
+
 )
 
 PROMPT_VIDEO_DEVICE = (
-"You are an academic catalog writer for a museum of technology. \n"
-"Your task is to create concise, formal catalog entries for historical objects. \n"
-"Always write in a neutral, factual tone, like a printed catalog. \n"
-"Do not invent facts: only use the provided information or what is clearly visible in the image. \n"
+"You are an academic catalog writer specializing in the history of video technology for a technology museum. \n"
+"Your task is to create a concise, formal catalog entry for the video device presented in the image. \n"
+"Always write in a neutral, factual tone, like a printed catalog entry. Do not invent facts: only use the provided information or what is clearly visible in the image. \n"
 "Format: 3–5 sentences in one paragraph, no bullets. \n"
-"Include: object type, manufacturer, model name, year, and notable context. \n"
-"If any information is unknown, mark it as unknown.\n"
+"Content Requirements (Specific to Video Devices):\n"
+"Include the following information: device type (e.g., television set, video camera, camcorder, film projector, video cassette recorder, monitor), display or recording medium visible (e.g., CRT, VHS cassette, Betamax tape, film reel, digital cassette, optical disc), manufacturer, model name/number, year/era of production, and notable technical or design features (e.g., screen size and casing style, control panel layout, lens and viewfinder design, tape-loading mechanism, portability, stand or housing).  \n"
+"If any specific piece of information (manufacturer, model, year) is unknown, you must explicitly mark it as unknown"
 )
 
 PROMPT_AUDIO_DEVICE = (
-"You are an academic catalog writer for a museum of technology. \n"
-"Your task is to create concise, formal catalog entries for historical objects. \n"
-"Always write in a neutral, factual tone, like a printed catalog. \n"
-"Do not invent facts: only use the provided information or what is clearly visible in the image. \n"
+"You are an academic catalog writer specializing in the history of audio technology for a technology museum. \n"
+"Your task is to create a concise, formal catalog entry for the audio device presented in the image. \n"
+"Always write in a neutral, factual tone, like a printed catalog entry. Do not invent facts: only use the provided information or what is clearly visible in the image. \n"
 "Format: 3–5 sentences in one paragraph, no bullets. \n"
-"Include: object type, manufacturer, model name, year, and notable context. \n"
-"If any information is unknown, mark it as unknown.\n"
+"Content Requirements (Specific to Audio Devices): \n"
+"Include the following information: device type (e.g., phonograph, gramophone, reel-to-reel tape recorder, cassette player, record player, portable audio unit), playback or recording medium visible (e.g., vinyl record, magnetic tape, cassette, disc), manufacturer, model name/number, year/era of production, and notable technical or design features (e.g., tonearm and cartridge design, speaker arrangement, control knobs, casing material, portability). \n"
+"If any specific piece of information (manufacturer, model, year) is unknown, you must explicitly mark it as unknown"
 )
 
 PROMPT_GENERIC = (
@@ -140,15 +141,15 @@ def describe_group(client: genai.Client, model_name: str, prompt: str, paths: Li
 
 def run(image_dir: Path, output_path: Path, model_name: str) -> None:
     client = configure_client()
-    print("[1] Gemini client configured.")
+    print("[1] Gemini client configured.", flush=True)
     grouped = group_images(image_dir)
-    print(f"[2] Images grouped: {len(grouped)} group(s) found.")
+    # print(f"[2] Images grouped: {len(grouped)} group(s) found.", flush=True)
     for item_id, paths in grouped.items():
-        print(f"[3] Sending categorization prompt for item {item_id} ...")
+        print(f"[2] Sending categorization prompt for item {item_id} ...", flush=True)
         try:
             classification = categorize_group(client, model_name, paths)
             top_category = classification["top_category"]
-            print(f"[4] Category received for item {item_id}: {top_category}")
+            print(f"[3] Category received for item {item_id}: {top_category}", flush=True)
             # Prompt selection
             if top_category == "telephones":
                 prompt = PROMPT_TELEPHONE
@@ -158,11 +159,13 @@ def run(image_dir: Path, output_path: Path, model_name: str) -> None:
                 prompt = PROMPT_AUDIO_DEVICE
             else:
                 prompt = PROMPT_GENERIC
-            print(f"[5] Sending description prompt for item {item_id} ...")
+            print(f"[4] Sending description prompt for item {item_id} ...", flush=True)
             description = describe_group(client, model_name, prompt, paths)
-            print(f"Item {item_id} ({top_category}):\n{description}\n{'-'*40}")
+            # Schöner formatieren: Item-Zeile fett, Beschreibung darunter
+            print(f"<item>{item_id} ({top_category})</item>", flush=True)
+            print(description, flush=True)
         except Exception as exc:
-            print(f"Item {item_id}: Error - {exc}\n{'-'*40}")
+            print(f"Item {item_id}: Error - {exc}\n{'-'*40}", flush=True)
 
 # Parse CLI arguments controlling input directory, output path, and model selection.
 def parse_args() -> argparse.Namespace:
@@ -178,7 +181,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--output",
         type=Path,
-        default=Path("catalog_results.json"),
+        default=Path("meta/catalog_results.json"),
         help="Path to write the JSON output.",
     )
     parser.add_argument(
