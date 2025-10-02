@@ -5,17 +5,18 @@ This project supports automatic categorization and description of museum objects
 ## Features
 - Automatic grouping and categorization of images
 - AI-based object description
+- Modular prompt management (all prompts in `helper/prompts.py`)
 - Webapp with live output and image preview
 - Loading animation and appealing design
 - Results can be saved as JSON in the `meta` folder
 
 ## Project Structure
 ```
-├── helper/                # Helper functions (e.g. for paths, dicts)
+├── helper/                # Helper functions and prompts (prompts.py)
 ├── meta/                  # Metadata and result files (JSON)
 ├── Pictures/              # Image directories
-├── geminiScript.py        # Pipeline for categorization and description
-├── extendedPipelineGemini.py # Extended pipeline with live output
+├── geminiScript.py        # Pipeline for categorization and description (imports prompts)
+├── extendedPipelineGemini.py # Extended pipeline with live output (imports prompts)
 ├── webapp.py              # Flask webapp
 ├── requirements.txt       # Python dependencies
 └── README.md              # This guide
@@ -37,7 +38,7 @@ This project supports automatic categorization and description of museum objects
   ```sh
   python geminiScript.py --image-dir Pictures/List2 --output meta/catalog_results-list2-cat.json
   ```
-- Extended pipeline:
+- Extended pipeline with live status:
   ```sh
   python extendedPipelineGemini.py --image-dir Pictures/List2 --output meta/catalog_results-list2-cat.json
   ```
@@ -58,11 +59,11 @@ This project supports automatic categorization and description of museum objects
   - `meta/catalog_results-list3.json`
 
 ## Notes
+- All prompts are managed in `helper/prompts.py` and imported in the main scripts for easy modification and extension.
 - The webapp displays each processing step with delay and loading animation.
 - The final description is visually highlighted.
 - A valid Google Gemini API key is required for usage.
 
 ---
-
 
 Feel free to reach out for questions or improvements!

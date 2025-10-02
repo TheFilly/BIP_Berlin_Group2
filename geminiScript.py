@@ -10,17 +10,7 @@ from google import genai
 
 # INFO: Running Instructions
 # python3 geminiScript.py --image-dir Pictures/List2
-TOP_CATEGORIES = ["video devices", "audio devices", "telephones", "other"]
-
-PROMPT = (
-    "You are a museum cataloging assistant.\n"
-    "Review the provided image group belonging to a single catalog item.\n"
-    f"Assign exactly one top category from this list: {', '.join(TOP_CATEGORIES)}.\n"
-    "Create a concise subcategory that further describes the object, such as 'rotary phone', 'hairdryer', etc. Avoid extra text.\n"
-    "Respond with valid JSON using this schema: {\"top_category\": string, \"subcategory\": string}.\n"
-    "Top category must match one of the allowed values exactly.\n"
-    "Do not include explanations, Markdown, or additional text."
-)
+from helper.prompts import TOP_CATEGORIES, PROMPT_CATEGORIZE
 
 # Establish a Gemini client using the API key pulled from the environment.
 def configure_client() -> genai.Client:
@@ -54,7 +44,7 @@ def group_images(image_dir: Path) -> Dict[str, List[Path]]:
 def categorize_group(
     client: genai.Client, model_name: str, paths: List[Path]
 ) -> Dict[str, str]:
-    parts = [{"text": PROMPT}, *[load_image_part(p) for p in sorted(paths)]]
+    parts = [{"text": PROMPT_CATEGORIZE}, *[load_image_part(p) for p in sorted(paths)]]
     response = client.models.generate_content(
         model=model_name,
         contents=[{"role": "user", "parts": parts}],

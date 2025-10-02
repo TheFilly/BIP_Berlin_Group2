@@ -195,7 +195,6 @@ def upload():
 
 
 # Run-Route: Skript ausführen mit Upload-Verzeichnis
-# Run-Route: Skript ausführen mit Upload-Verzeichnis
 
 # Live-Stream-Route: Skript ausführen und Output live senden
 from flask import Response
